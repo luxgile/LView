@@ -1,0 +1,101 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'LView'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=LView"
+                ],
+                "filter": {
+                    "name": "LView",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'dev'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=dev",
+                    "--package=LView"
+                ],
+                "filter": {
+                    "name": "dev",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'dev'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=dev",
+                    "--package=LView"
+                ],
+                "filter": {
+                    "name": "dev",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'lvr'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=lvr",
+                    "--package=LView"
+                ],
+                "filter": {
+                    "name": "lvr",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'lvr'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=lvr",
+                    "--package=LView"
+                ],
+                "filter": {
+                    "name": "lvr",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
