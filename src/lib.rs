@@ -1,6 +1,6 @@
 use std::fmt::{self, Error, Formatter};
 
-use ldrawy::*;
+use ldrawy::{glutin::event::WindowEvent, *};
 
 #[derive(Debug)]
 pub enum ScreenVal {
@@ -136,7 +136,7 @@ impl Transform {
 }
 
 pub trait Component {
-    fn process(&mut self) {}
+    fn process(&mut self, _event: &Event<'_, ()>) {}
 }
 
 #[derive(Default)]
@@ -197,6 +197,15 @@ impl<'a> View {
             child.process_batch(batch, &rect);
         }
     }
+    pub fn process_event(&mut self, event: &Event<'_, ()>) {
+        for component in self.components.iter_mut() {
+            component.process(event);
+        }
+        //TODO: Handle event cancelation to optimize.
+        for child in self.children.iter_mut() {
+            child.process_event(event);
+        }
+    }
 }
 
 #[derive(Default)]
@@ -204,14 +213,20 @@ pub struct Button {
     pub on_press: Option<Box<dyn FnMut()>>,
 }
 impl Component for Button {
-    fn process(&mut self) {}
+    fn process(&mut self, event: &Event<'_, ()>) {
+        if let Event::WindowEvent {
+            window_id: _,
+            event: w_event,
+        } = event
+        {}
+    }
 }
 #[derive(Default)]
 pub struct Text {
     pub text: String,
 }
 impl Component for Text {
-    fn process(&mut self) {}
+    fn process(&mut self, event: &Event<'_, ()>) {}
 }
 
 #[derive(Default)]
@@ -220,18 +235,31 @@ pub struct Window {
 }
 
 #[derive(Default)]
-struct InternalEngine {
+struct InternalEngine<'a> {
     main: Window,
+    last_ev: Option<Event<'a, ()>>,
+    curr_ev: Option<Event<'a, ()>>,
 }
 
-impl InternalEngine {
+impl<'a> InternalEngine<'a> {
     pub fn run(main: Window) -> ! {
-        let engine = InternalEngine { main: main };
+        let engine = InternalEngine {
+            main: main,
+            ..Default::default()
+        };
         ldrawy::Window::create_and_run(WindowSettings::new(60), engine)
     }
 }
 
-impl UserWindowHandler for InternalEngine {
+impl<'a> UserWindowHandler for InternalEngine<'a> {
+    fn process_logic(&mut self, _wnd: &ldrawy::Window, event: &Event<'_, ()>) -> Result<(), LErr> {
+        //TODO: Create context based on window inputs and send over to process it.
+        self.last_ev = self.curr_ev;
+        let mut ev: Event<'a, _> = event.clone();
+        self.curr_ev = Some(ev);
+        self.main.root.process_event(event);
+        Ok(())
+    }
     fn process_render(&mut self, wnd: &ldrawy::Window) -> Result<(), LErr> {
         if wnd.frame_count() % 300 == 0 {
             println!("{:#?}", self.main.root);
@@ -250,10 +278,6 @@ impl UserWindowHandler for InternalEngine {
         self.main.root.process_batch(&mut batch, &canvas.get_rect());
         canvas.draw_batch(wnd, &brush, batch.bake_buffers(wnd), &DrawParams::default());
         canvas.finish_canvas()?;
-        Ok(())
-    }
-    fn process_logic(&mut self, wnd: &ldrawy::Window) -> Result<(), LErr> {
-        //TODO: Create context based on window inputs and send over to process it.
         Ok(())
     }
 }

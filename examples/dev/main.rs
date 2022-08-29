@@ -1,8 +1,8 @@
 use ldrawy::*;
-use LView::*;
+use lview::*;
 
 fn main() -> Result<(), LErr> {
-    LView::render_window(StartPlay)
+    lview::render_window(StartPlay)
 }
 
 struct StartPlay;
